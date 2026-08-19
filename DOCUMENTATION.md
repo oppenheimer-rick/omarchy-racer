@@ -14,13 +14,14 @@
    - [Stage 5: Status Bar Placement & Optical Glyph Centering](#stage-5-status-bar-placement--optical-glyph-centering)
    - [Stage 6: Public Release & Open Source Packaging](#stage-6-public-release--open-source-packaging)
    - [Stage 7: OutRun 3D Road Racer & Clutter-Free Hotkey Switching](#stage-7-outrun-3d-road-racer--clutter-free-hotkey-switching)
+   - [Stage 8: The DOOM Integration Phase (Native vs WebAssembly Architecture)](#stage-8-the-doom-integration-phase-native-vs-webassembly-architecture)
 3. [Technical Architecture](#-technical-architecture)
 
 ---
 
 ## 🌟 Executive Summary
 
-**Omarchy Racer** is a standalone, lightweight, zero-latency desktop widget for [Omarchy Quattro](https://omarchy.org). It embeds retro classics—**Jake Gordon's OutRun 3D Road Racer** and the iconic **Chrome Dinosaur Runner**—directly inside the Wayland status bar. 
+**Omarchy Racer** is a standalone, lightweight, zero-latency desktop widget for [Omarchy Quattro](https://omarchy.org). It embeds retro classics—**Jake Gordon's OutRun 3D Road Racer**, the iconic **Chrome Dinosaur Runner**, and **DOOM**—directly inside the Wayland status bar. 
 
 Unlike traditional Linux game launchers that spawn heavy X11/Wayland windows, Omarchy Racer renders **100% inside Quickshell's hardware-accelerated layer-shell popup**. It uses 0% CPU and negligible RAM when closed, and responds instantly upon clicking the status bar icon.
 
@@ -29,7 +30,7 @@ Unlike traditional Linux game launchers that spawn heavy X11/Wayland windows, Om
 | **Target Shell** | Omarchy Quattro / Quickshell (Qt 6 QML) |
 | **Engine** | Pure V8 JavaScript Physics + Qt Quick GPU Scene Graph |
 | **FPS Target** | 60 FPS Ultra-Smooth |
-| **Included Games** | OutRun 3D Racer *(Default)* & Chrome Dinosaur |
+| **Included Games** | OutRun 3D Racer *(Default)*, Chrome Dino & DOOM |
 | **Switching** | Instant hotkey (`Tab` or `G`) with 0 on-screen UI clutter |
 | **Idle CPU / RAM** | 0.0% CPU / < 4 MB RAM |
 | **GitHub Repository** | [https://github.com/oppenheimer-rick/omarchy-racer](https://github.com/oppenheimer-rick/omarchy-racer) |
@@ -123,6 +124,22 @@ To expand beyond a single title into an arcade vault without adding visual clutt
 
 ---
 
+### Stage 8: The DOOM Integration Phase (Native vs. WebAssembly Architecture)
+
+For 3D titles like DOOM, we analyzed two leading open-source approaches:
+
+#### 1. Native Source-Port Launcher ([Deoxizn/omarchy-doom](https://github.com/Deoxizn/omarchy-doom))
+- **How it works**: Uses `Quickshell.Io.Process` to launch a high-performance Wayland/OpenGL source port (`doomretro`, `chocolate-doom`, `gzdoom`).
+- **WAD Detection**: Automatically scans standard paths (`~/Games/doom`, `~/.local/share/doom`, `/usr/share/doom`) for `DOOM.WAD` or `DOOM1.WAD`.
+- **Pros**: 120+ FPS, native controller support, full audio fidelity, zero WASM compilation overhead.
+
+#### 2. Embedded WebAssembly Port ([UstymUkhman/webDOOM](https://github.com/UstymUkhman/webDOOM))
+- **How it works**: Compiles PrBoom C codebase to Emscripten WebAssembly (`doom1.wasm` + `doom1.data`).
+- **Pros**: Embeds directly inside the browser / canvas without spawning external processes.
+- **Trade-offs**: Requires downloading ~96 MB shareware WAD data package.
+
+---
+
 ## 🏗️ Technical Architecture
 
 ```mermaid
@@ -133,8 +150,10 @@ graph TD
     KeyCatcher -->|Routes Tab/G| Switcher{"Active Game Selector"}
     Switcher -->|Racer Mode| Racer["RacerGame.qml (3D Road Engine)"]
     Switcher -->|Dino Mode| Dino["DinoGame.qml (2D Sprite Runner)"]
+    Switcher -->|DOOM Launcher| Doom["DoomLauncher (Process Manager)"]
     Racer -->|Reads Math| RacerModel["RacerModel.js (3D Perspective Math)"]
     Racer -->|Draws Assets| RacerAssets["Assets/Racer/ (background.png, sprites.png)"]
     Dino -->|Reads Math| DinoModel["Model.js (Physics Engine)"]
     Dino -->|Draws Assets| DinoAssets["Assets/Dino/ (Sprites)"]
+    Doom -->|Spawns| DoomRetro["doomretro / chocolate-doom / gzdoom"]
 ```

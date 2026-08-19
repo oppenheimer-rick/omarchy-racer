@@ -1,6 +1,6 @@
-# Omarchy Racer
+# Omarchy Racer & Arcade
 
-> 🏎️ **Zero-latency in-bar OutRun 3D road racer & retro arcade hub for [Omarchy](https://omarchy.org).**
+> 🏎️ **Zero-latency in-bar OutRun 3D road racer, Chrome Dino, and DOOM for [Omarchy](https://omarchy.org).**
 
 *<span style="color: #888888;">[📖 Read the Full Engineering & Architecture Documentation](DOCUMENTATION.md) →</span>*
 
@@ -28,6 +28,7 @@ You can switch between games instantly at any time without menus or extra screen
 
 1. **🏎️ OutRun 3D Road Racer** *(Default)*: Authentic pseudo-3D road racer with procedural infinite tracks, hills, curves, parallax sky/mountains, traffic AI, and roadside billboards.
 2. **🦖 Chrome Dinosaur Runner**: The classic jump-and-duck endless runner with authentic physics and speed acceleration.
+3. **🔥 DOOM**: Quick-launch into DOOM via auto-detected WADs and high-performance Wayland source ports (`doomretro`, `chocolate-doom`, `gzdoom`).
 
 ---
 
@@ -36,7 +37,7 @@ You can switch between games instantly at any time without menus or extra screen
 ### 🔄 Global Switcher
 | Key | Action |
 | :--- | :--- |
-| **`TAB` / `G`** | **Switch between OutRun Racer & Dino Runner** |
+| **`TAB` / `G`** | **Cycle between OutRun Racer, Dino Runner, and DOOM** |
 | **`ESC`** | Close popup window |
 
 ### 🏎️ OutRun 3D Racer *(Default)*
@@ -55,6 +56,11 @@ You can switch between games instantly at any time without menus or extra screen
 | **`↓` / `S`** | Duck |
 | **`P`** | Pause / Resume |
 | **`R`** | Restart |
+
+### 🔥 DOOM
+| Key / Input | Action |
+| :--- | :--- |
+| **`ENTER` / `SPACE` / Click** | Launch DOOM (Rip and Tear) |
 
 ---
 
@@ -85,23 +91,8 @@ When adding games to an Omarchy / Quickshell status bar plugin, **Pure HTML/Canv
 2. **Legendary Curated Repositories**:
    - **[Jake Gordon's JavaScript Suite](https://github.com/jakesgordon)**: OutRun Racer, Tetris, Pong, Snake.
    - **[KilledByAPixel / LittleJS](https://github.com/KilledByAPixel/LittleJS)**: Micro-engine 2D arcade games.
-   - **[proyecto26/awesome-jsgames](https://github.com/proyecto26/awesome-jsgames)**: Directory of classic arcade web games.
-
----
-
-### 🤖 How to Tell Your Coding Agent to Port Any Game
-
-Found a cool open-source game on GitHub? Copy and paste this prompt to your AI coding assistant (Antigravity, Claude, ChatGPT):
-
-```markdown
-I found this open-source web game: <INSERT_GITHUB_URL>
-
-Please port this game into my omarchy-racer plugin:
-1. Extract the core game logic, physics, and state machine into a pure JavaScript module ([GameName]Model.js) without any DOM dependencies.
-2. Create a Qt Quick Canvas component ([GameName]Game.qml) that renders the game at 60 FPS using standard Canvas 2D math.
-3. Wire the game into Panel.qml so it can be played edge-to-edge inside the square popup.
-4. Keep the screen completely clutter-free with zero extra text or menu headers, and allow switching games with the TAB key.
-```
+   - **[Deoxizn / omarchy-doom](https://github.com/Deoxizn/omarchy-doom)**: Native DOOM source-port integration.
+   - **[UstymUkhman / webDOOM](https://github.com/UstymUkhman/webDOOM)**: WebAssembly / PrBoom browser DOOM.
 
 ---
 
