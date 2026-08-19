@@ -1,13 +1,13 @@
-# Omarchy Arcade
+# Omarchy Racer
 
-> 🏎️ **Zero-latency in-bar retro arcade hub (OutRun 3D Racer & Chrome Dino) for [Omarchy](https://omarchy.org).**
+> 🏎️ **Zero-latency in-bar OutRun 3D road racer & retro arcade hub for [Omarchy](https://omarchy.org).**
 
 *<span style="color: #888888;">[📖 Read the Full Engineering & Architecture Documentation](DOCUMENTATION.md) →</span>*
 
 ---
 
 <p align="center">
-  <img src="docs/videos/showcase.gif" alt="Omarchy Arcade Gameplay Showcase" width="100%" />
+  <img src="docs/videos/showcase.gif" alt="Omarchy Racer Gameplay Showcase" width="100%" />
 </p>
 
 ---
@@ -15,18 +15,18 @@
 ## 📦 Install
 
 ```bash
-omarchy plugin add https://github.com/oppenheimer-rick/omarchy-dino.git --enable
+omarchy plugin add https://github.com/oppenheimer-rick/omarchy-racer.git --enable
 ```
 
 > *Omarchy clones the repository, validates its manifest and components locally, and enables the plugin instantly.*
 
 ---
 
-## 🕹️ Included Games & Switching
+## 🕹️ Included Games & Hotkey Switching
 
 You can switch between games instantly at any time without menus or extra screen clutter by pressing **`Tab`** or **`G`**:
 
-1. **🏎️ OutRun 3D Road Racer** *(Default)*: Authentic pseudo-3D road racer with curves, hills, parallax sky/mountains, traffic AI, and roadside billboards.
+1. **🏎️ OutRun 3D Road Racer** *(Default)*: Authentic pseudo-3D road racer with procedural infinite tracks, hills, curves, parallax sky/mountains, traffic AI, and roadside billboards.
 2. **🦖 Chrome Dinosaur Runner**: The classic jump-and-duck endless runner with authentic physics and speed acceleration.
 
 ---
@@ -46,7 +46,7 @@ You can switch between games instantly at any time without menus or extra screen
 | **`↓` / `S`** | Brake / Slow down |
 | **`←` `→` / `A` `D`** | Steer Left / Right |
 | **`P`** | Pause / Resume |
-| **`R`** | Restart Race |
+| **`R`** | Generate New Random Track |
 
 ### 🦖 Chrome Dinosaur Runner
 | Key / Input | Action |
@@ -58,13 +58,50 @@ You can switch between games instantly at any time without menus or extra screen
 
 ---
 
-## ✨ Features
+## 🧭 Guide: How to Find & Add More Games
 
-- **⚡ Zero-Latency Native Execution**: Powered directly by Quickshell's V8 engine and GPU-accelerated Qt Quick Canvas 2D.
-- **🎯 Dynamic Square Viewport**: Clean 380×320 square card designed to fit naturally on any monitor resolution.
-- **👾 Retro 8-Bit Pixel Bar Icon**: Uses JetBrainsMono Nerd Font Space Invader glyph (`\udb82\udfc9`) with optical centering.
-- **🛡️ 0% Idle Resource Usage**: Completely sleeps when closed, consuming zero CPU cycles and negligible memory.
-- **🎛️ Configurable Bar Placement**: Easily switch between **Right** and **Center** status bar positioning.
+### 💡 Format Comparison: Pure HTML/Canvas (JS) vs. PyGame
+
+When adding games to an Omarchy / Quickshell status bar plugin, **Pure HTML/Canvas JavaScript is vastly superior to PyGame**:
+
+| Feature | Pure HTML/Canvas JS 🟢 | PyGame / Python 🔴 |
+| :--- | :--- | :--- |
+| **Runtime & Dependencies** | **0 dependencies** (Runs on Quickshell's built-in V8 engine) | Requires Python, virtualenvs, SDL2, and PyGame binaries |
+| **Memory Footprint** | **< 4 MB RAM** | **180 MB - 300+ MB RAM** |
+| **Window Integration** | **Native Wayland Layer-Shell** (Clips seamlessly into the popup card) | Spawns a detached external floating window |
+| **Startup Latency** | **0 ms (Instant)** | 400ms - 1.2s Python interpreter cold start |
+| **CPU Usage** | **0.0% when closed** (Fully slept) | Lingers in background process tree unless manually killed |
+
+> **Verdict**: Always choose **Canvas 2D / Vanilla JavaScript** games for Omarchy plugins.
+
+---
+
+### 🔍 Where to Find High-Quality Open-Source Web Games on GitHub
+
+1. **GitHub Topics**:
+   - [`#js13k`](https://github.com/topics/js13k) — Games built under 13KB with 0 external dependencies (the highest code quality).
+   - [`#canvas-game`](https://github.com/topics/canvas-game) — Clean, standard HTML5 2D Canvas games.
+   - [`#javascript-games`](https://github.com/topics/javascript-games) — Curated open-source classic games.
+2. **Legendary Curated Repositories**:
+   - **[Jake Gordon's JavaScript Suite](https://github.com/jakesgordon)**: OutRun Racer, Tetris, Pong, Snake.
+   - **[KilledByAPixel / LittleJS](https://github.com/KilledByAPixel/LittleJS)**: Micro-engine 2D arcade games.
+   - **[proyecto26/awesome-jsgames](https://github.com/proyecto26/awesome-jsgames)**: Directory of classic arcade web games.
+
+---
+
+### 🤖 How to Tell Your Coding Agent to Port Any Game
+
+Found a cool open-source game on GitHub? Copy and paste this prompt to your AI coding assistant (Antigravity, Claude, ChatGPT):
+
+```markdown
+I found this open-source web game: <INSERT_GITHUB_URL>
+
+Please port this game into my omarchy-racer plugin:
+1. Extract the core game logic, physics, and state machine into a pure JavaScript module ([GameName]Model.js) without any DOM dependencies.
+2. Create a Qt Quick Canvas component ([GameName]Game.qml) that renders the game at 60 FPS using standard Canvas 2D math.
+3. Wire the game into Panel.qml so it can be played edge-to-edge inside the square popup.
+4. Keep the screen completely clutter-free with zero extra text or menu headers, and allow switching games with the TAB key.
+```
 
 ---
 
@@ -75,7 +112,7 @@ In your `~/.config/omarchy/shell.json`, position the widget wherever you prefer:
 ```json
 "right": [
   {
-    "id": "io.github.oppenheimer-rick.omarchy-dino"
+    "id": "io.github.oppenheimer-rick.omarchy-racer"
   }
 ]
 ```

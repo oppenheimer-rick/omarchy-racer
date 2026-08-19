@@ -112,20 +112,19 @@ Item {
       var cameraY = gameState.cameraHeight + playerY
       var cameraZ = gameState.position - (basePercent * gameState.segmentLength)
 
-      // 1. Full-Height Solid Ground & Sky Base
-      ctx.fillStyle = "#72D7EE"
-      ctx.fillRect(0, 0, w, h * 0.55)
-      ctx.fillStyle = "#10AA10"
-      ctx.fillRect(0, h * 0.45, w, h * 0.55)
-
-      // 2. Draw Parallax Background (Seamless 3-Layer Panoramic Scroll)
+      // 1. Draw Parallax Background (Sky, Mountains, Distant Trees)
       if (root.assetsLoaded) {
         renderBackground(ctx, root.bgSource, w, h, Model.BACKGROUND.SKY, gameState.skyOffset, 0)
         renderBackground(ctx, root.bgSource, w, h, Model.BACKGROUND.HILLS, gameState.hillOffset, 0)
         renderBackground(ctx, root.bgSource, w, h, Model.BACKGROUND.TREES, gameState.treeOffset, 0)
+      } else {
+        ctx.fillStyle = "#72D7EE"
+        ctx.fillRect(0, 0, w, h * 0.5)
+        ctx.fillStyle = "#10AA10"
+        ctx.fillRect(0, h * 0.5, w, h * 0.5)
       }
 
-      // 3. Draw 3D Road Segments (Back-to-Front Projection)
+      // 2. Draw 3D Road Segments
       var maxy = h
       var x = 0
       var dx = -(baseSegment.curve * basePercent)
@@ -145,45 +144,54 @@ Item {
         if ((segment.p1.camera.z <= gameState.cameraDepth) || (segment.p2.screen.y >= segment.p1.screen.y) || (segment.p2.screen.y >= maxy))
           continue
 
-        // Grass Poly
+        var y1 = segment.p1.screen.y
+        var y2 = segment.p2.screen.y
+        var x1 = segment.p1.screen.x
+        var x2 = segment.p2.screen.x
+        var w1 = segment.p1.screen.w
+        var w2 = segment.p2.screen.w
+
+        var r1 = w1 / Math.max(6, 2 * gameState.lanes)
+        var r2 = w2 / Math.max(6, 2 * gameState.lanes)
+
+        // Draw Left & Right Grass separately (prevents green bleed across the road)
         ctx.fillStyle = segment.color.grass
-        ctx.fillRect(0, segment.p2.screen.y, w, segment.p1.screen.y - segment.p2.screen.y + 1)
+        drawPoly(ctx, 0, y1 + 1, x1 - w1 - r1, y1 + 1, x2 - w2 - r2, y2, 0, y2)
+        drawPoly(ctx, x1 + w1 + r1, y1 + 1, w, y1 + 1, w, y2, x2 + w2 + r2, y2)
 
-        // Rumble Poly
-        var r1 = segment.p1.screen.w / Math.max(6, 2 * gameState.lanes)
-        var r2 = segment.p2.screen.w / Math.max(6, 2 * gameState.lanes)
+        // Rumble Strips (with 1px overlap to prevent sub-pixel gaps)
         ctx.fillStyle = segment.color.rumble
-        drawPoly(ctx, segment.p1.screen.x - segment.p1.screen.w - r1, segment.p1.screen.y, segment.p1.screen.x - segment.p1.screen.w, segment.p1.screen.y, segment.p2.screen.x - segment.p2.screen.w, segment.p2.screen.y, segment.p2.screen.x - segment.p2.screen.w - r2, segment.p2.screen.y)
-        drawPoly(ctx, segment.p1.screen.x + segment.p1.screen.w + r1, segment.p1.screen.y, segment.p1.screen.x + segment.p1.screen.w, segment.p1.screen.y, segment.p2.screen.x + segment.p2.screen.w, segment.p2.screen.y, segment.p2.screen.x + segment.p2.screen.w + r2, segment.p2.screen.y)
+        drawPoly(ctx, x1 - w1 - r1, y1 + 1, x1 - w1, y1 + 1, x2 - w2, y2, x2 - w2 - r2, y2)
+        drawPoly(ctx, x1 + w1, y1 + 1, x1 + w1 + r1, y1 + 1, x2 + w2 + r2, y2, x2 + w2, y2)
 
-        // Road Poly
+        // Road Surface (with 1px vertical overlap to completely eliminate seam lines)
         ctx.fillStyle = segment.color.road
-        drawPoly(ctx, segment.p1.screen.x - segment.p1.screen.w, segment.p1.screen.y, segment.p1.screen.x + segment.p1.screen.w, segment.p1.screen.y, segment.p2.screen.x + segment.p2.screen.w, segment.p2.screen.y, segment.p2.screen.x - segment.p2.screen.w, segment.p2.screen.y)
+        drawPoly(ctx, x1 - w1, y1 + 1, x1 + w1, y1 + 1, x2 + w2, y2, x2 - w2, y2)
 
         // Lane markings
         if (segment.color.lane) {
-          var l1 = segment.p1.screen.w / 32
-          var l2 = segment.p2.screen.w / 32
+          var l1 = w1 / 32
+          var l2 = w2 / 32
           for (var lane = 1; lane < gameState.lanes; lane++) {
-            var laneW1 = (segment.p1.screen.w * 2 / gameState.lanes) * lane
-            var laneW2 = (segment.p2.screen.w * 2 / gameState.lanes) * lane
+            var laneW1 = (w1 * 2 / gameState.lanes) * lane
+            var laneW2 = (w2 * 2 / gameState.lanes) * lane
             ctx.fillStyle = segment.color.lane
-            drawPoly(ctx, segment.p1.screen.x - segment.p1.screen.w + laneW1 - l1/2, segment.p1.screen.y, segment.p1.screen.x - segment.p1.screen.w + laneW1 + l1/2, segment.p1.screen.y, segment.p2.screen.x - segment.p2.screen.w + laneW2 + l2/2, segment.p2.screen.y, segment.p2.screen.x - segment.p2.screen.w + laneW2 - l2/2, segment.p2.screen.y)
+            drawPoly(ctx, x1 - w1 + laneW1 - l1/2, y1 + 1, x1 - w1 + laneW1 + l1/2, y1 + 1, x2 - w2 + laneW2 + l2/2, y2, x2 - w2 + laneW2 - l2/2, y2)
           }
         }
 
         // Atmospheric Fog
         if (segment.fog < 1) {
-          ctx.globalAlpha = (1 - segment.fog) * 0.65
+          ctx.globalAlpha = (1 - segment.fog) * 0.7
           ctx.fillStyle = Model.COLORS.FOG
-          ctx.fillRect(0, segment.p2.screen.y, w, segment.p1.screen.y - segment.p2.screen.y + 1)
+          ctx.fillRect(0, y2, w, y1 - y2 + 1)
           ctx.globalAlpha = 1
         }
 
         maxy = segment.p1.screen.y
       }
 
-      // 4. Draw Roadside Billboards, Trees, Traffic, and Player (Back-to-Front)
+      // 3. Draw Roadside Billboards, Trees, Traffic, and Player (Back-to-Front)
       if (root.assetsLoaded) {
         for (var sn = gameState.drawDistance - 1; sn > 0; sn--) {
           var seg = gameState.segments[(baseSegment.index + sn) % gameState.segments.length]
@@ -226,9 +234,9 @@ Item {
         }
       }
 
-      // 5. Retro Digital HUD
+      // 4. Retro Digital HUD
       var mph = Math.round((gameState.speed / gameState.maxSpeed) * 180)
-      ctx.fillStyle = "rgba(0, 0, 0, 0.55)"
+      ctx.fillStyle = "rgba(0, 0, 0, 0.6)"
       ctx.fillRect(8, 8, 105, 24)
       ctx.fillRect(w - 105, 8, 97, 24)
 
@@ -258,7 +266,7 @@ Item {
       var destX = 0
       var destY = offset
       var destW = Math.floor(width * (sourceW / imageW))
-      var destH = Math.floor(height * 0.5)
+      var destH = Math.floor(height * 0.52)
 
       ctx.drawImage(bgImage, sourceX, sourceY, sourceW, sourceH, destX, destY, destW, destH)
       if (sourceW < imageW)

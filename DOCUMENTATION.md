@@ -1,4 +1,4 @@
-# Building Omarchy Arcade: Engineering an In-Bar Retro Engine for Omarchy Quattro
+# Building Omarchy Racer: Engineering an In-Bar Retro Engine for Omarchy Quattro
 
 > **A deep dive into crafting a zero-latency, embedded gaming popup inside Omarchy's Wayland desktop environment.**
 
@@ -20,9 +20,9 @@
 
 ## 🌟 Executive Summary
 
-**Omarchy Arcade** is a standalone, lightweight, zero-latency desktop widget for [Omarchy Quattro](https://omarchy.org). It embeds retro classics—**Jake Gordon's OutRun 3D Road Racer** and the iconic **Chrome Dinosaur Runner**—directly inside the Wayland status bar. 
+**Omarchy Racer** is a standalone, lightweight, zero-latency desktop widget for [Omarchy Quattro](https://omarchy.org). It embeds retro classics—**Jake Gordon's OutRun 3D Road Racer** and the iconic **Chrome Dinosaur Runner**—directly inside the Wayland status bar. 
 
-Unlike traditional Linux game launchers that spawn heavy X11/Wayland windows, Omarchy Arcade renders **100% inside Quickshell's hardware-accelerated layer-shell popup**. It uses 0% CPU and negligible RAM when closed, and responds instantly upon clicking the status bar icon.
+Unlike traditional Linux game launchers that spawn heavy X11/Wayland windows, Omarchy Racer renders **100% inside Quickshell's hardware-accelerated layer-shell popup**. It uses 0% CPU and negligible RAM when closed, and responds instantly upon clicking the status bar icon.
 
 | Key Metric | Value |
 | :--- | :--- |
@@ -32,7 +32,7 @@ Unlike traditional Linux game launchers that spawn heavy X11/Wayland windows, Om
 | **Included Games** | OutRun 3D Racer *(Default)* & Chrome Dinosaur |
 | **Switching** | Instant hotkey (`Tab` or `G`) with 0 on-screen UI clutter |
 | **Idle CPU / RAM** | 0.0% CPU / < 4 MB RAM |
-| **GitHub Repository** | [https://github.com/oppenheimer-rick/omarchy-dino](https://github.com/oppenheimer-rick/omarchy-dino) |
+| **GitHub Repository** | [https://github.com/oppenheimer-rick/omarchy-racer](https://github.com/oppenheimer-rick/omarchy-racer) |
 
 ---
 
@@ -105,7 +105,7 @@ We observed that standard FontAwesome icons (`fa-dragon`) are horizontally elong
 
 ### Stage 6: Public Release & Open Source Packaging
 - Cleaned up all author references and initialized git version control.
-- Created and pushed the public repository: [https://github.com/oppenheimer-rick/omarchy-dino](https://github.com/oppenheimer-rick/omarchy-dino).
+- Created and pushed the public repository: [https://github.com/oppenheimer-rick/omarchy-racer](https://github.com/oppenheimer-rick/omarchy-racer).
 - Fully validated with `omarchy plugin validate` (Exit code 0).
 
 ---
@@ -114,7 +114,7 @@ We observed that standard FontAwesome icons (`fa-dragon`) are horizontally elong
 To expand beyond a single title into an arcade vault without adding visual clutter:
 1. **Ported Jake Gordon's OutRun 3D Engine (`RacerModel.js` & `RacerGame.qml`)**:
    - 3D perspective projection (`project(p, cameraX, cameraY, cameraZ, cameraDepth, roadWidth)`)
-   - Curvature acceleration, centrifugal force simulation, and hill elevation arcs.
+   - Curvature acceleration, centrifugal force simulation, and procedural hill elevation arcs.
    - Parallax sky, hills, and tree background layer scrolling with `background.png`.
    - Sliced roadside billboards (`Code inComplete`, `LiquidPlanner`), palm trees, and AI opponent traffic cars from `sprites.png`.
 2. **Zero-UI Hotkey Switching**:

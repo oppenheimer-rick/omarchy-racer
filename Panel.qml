@@ -3,10 +3,10 @@ import Quickshell
 import qs.Commons
 import qs.Ui
 
-// Omarchy Retro Arcade Popup Window (Dino & OutRun Racer).
+// Omarchy Retro Arcade Popup Window (OutRun 3D Racer & Chrome Dino).
 Panel {
   id: root
-  moduleName: "io.github.oppenheimer-rick.omarchy-dino"
+  moduleName: "io.github.oppenheimer-rick.omarchy-racer"
   manageIpc: false
 
   property var anchorItem: null
@@ -34,10 +34,10 @@ Panel {
   }
 
   function switchGame() {
-    if (root.currentGame === "dino") {
-      root.currentGame = "racer"
-    } else {
+    if (root.currentGame === "racer") {
       root.currentGame = "dino"
+    } else {
+      root.currentGame = "racer"
     }
   }
 
@@ -58,20 +58,20 @@ Panel {
       onCloseRequested: root.close()
 
       Keys.onPressed: function(event) {
-        // Quick switch shortcut: Tab or G toggles between Dino and OutRun Racer
+        // Quick switch shortcut: Tab or G toggles between OutRun Racer and Dino Runner
         if (event.key === Qt.Key_Tab || event.key === Qt.Key_G) {
           root.switchGame()
           event.accepted = true
           return
         }
 
-        if (root.currentGame === "dino" && dinoLoader.item) {
-          if (dinoLoader.item.handleKeyPress(event)) {
+        if (root.currentGame === "racer" && racerLoader.item) {
+          if (racerLoader.item.handleKeyPress(event)) {
             event.accepted = true
             return
           }
-        } else if (root.currentGame === "racer" && racerLoader.item) {
-          if (racerLoader.item.handleKeyPress(event)) {
+        } else if (root.currentGame === "dino" && dinoLoader.item) {
+          if (dinoLoader.item.handleKeyPress(event)) {
             event.accepted = true
             return
           }
@@ -79,12 +79,12 @@ Panel {
       }
 
       Keys.onReleased: function(event) {
-        if (root.currentGame === "dino" && dinoLoader.item) {
-          if (dinoLoader.item.handleKeyRelease(event)) {
+        if (root.currentGame === "racer" && racerLoader.item) {
+          if (racerLoader.item.handleKeyRelease(event)) {
             event.accepted = true
           }
-        } else if (root.currentGame === "racer" && racerLoader.item) {
-          if (racerLoader.item.handleKeyRelease(event)) {
+        } else if (root.currentGame === "dino" && dinoLoader.item) {
+          if (dinoLoader.item.handleKeyRelease(event)) {
             event.accepted = true
           }
         }
@@ -94,16 +94,8 @@ Panel {
       Rectangle {
         anchors.fill: parent
         radius: Style.cornerRadius > 0 ? Style.cornerRadius : 6
-        color: root.currentGame === "dino" ? "#f7f7f7" : "#000000"
+        color: root.currentGame === "racer" ? "#000000" : "#f7f7f7"
         clip: true
-
-        Loader {
-          id: dinoLoader
-          anchors.fill: parent
-          active: root.currentGame === "dino"
-          visible: active
-          sourceComponent: DinoGame {}
-        }
 
         Loader {
           id: racerLoader
@@ -111,6 +103,14 @@ Panel {
           active: root.currentGame === "racer"
           visible: active
           sourceComponent: RacerGame {}
+        }
+
+        Loader {
+          id: dinoLoader
+          anchors.fill: parent
+          active: root.currentGame === "dino"
+          visible: active
+          sourceComponent: DinoGame {}
         }
       }
     }

@@ -4,12 +4,12 @@ import Quickshell.Io
 import qs.Commons
 import qs.Ui
 
-// Bar widget for Omarchy Dino.
+// Bar widget for Omarchy Racer.
 BarWidget {
   id: root
-  moduleName: "io.github.oppenheimer-rick.omarchy-dino"
+  moduleName: "io.github.oppenheimer-rick.omarchy-racer"
 
-  // Retro Space Invader Pixel Icon in JetBrainsMono Nerd Font (md-space_invaders: \udb82\udfc9)
+  // Retro Space Invader Pixel Icon in JetBrainsMono Nerd Font (\udb82\udfc9)
   readonly property string icon: "\udb82\udfc9"
   readonly property bool opened: panelLoader.item ? panelLoader.item.opened === true : false
 
@@ -51,7 +51,7 @@ BarWidget {
   }
 
   IpcHandler {
-    target: "io.github.oppenheimer-rick.omarchy-dino"
+    target: "io.github.oppenheimer-rick.omarchy-racer"
 
     function open(): void { root.open() }
     function close(): void { root.close() }
@@ -66,7 +66,7 @@ BarWidget {
     bar: root.bar
     text: root.icon
     slotSize: Style.bar.iconSlot
-    tooltipText: "Omarchy Dino — Click to play"
+    tooltipText: "Omarchy Racer — Click to play"
 
     onPressed: function(b) {
       root.togglePanel()
