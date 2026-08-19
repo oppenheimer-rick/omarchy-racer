@@ -18,7 +18,7 @@ Panel {
   property string currentGame: "racer"
   property string detectedWad: ""
 
-  // Aspect ratio configuration: clean 380x320 square card
+  // Clean compact square card aspect ratio
   readonly property int targetWidth: Style.space(380)
   readonly property int targetHeight: Style.space(320)
 
@@ -68,8 +68,23 @@ Panel {
   }
 
   function launchDoom() {
-    var binaries = ["doomretro", "chocolate-doom", "gzdoom", "prboom-plus"]
     var cmd = ["bash", "-c",
+      "CFG=\"$HOME/.config/doomretro/doomretro.cfg\"; " +
+      "if [ ! -f \"$CFG\" ]; then " +
+      "  mkdir -p \"$(dirname \"$CFG\")\"; " +
+      "  cat > \"$CFG\" << 'EOF'\n" +
+      "vid_fullscreen                   off\n" +
+      "vid_widescreen                   on\n" +
+      "vid_borderlesswindow             off\n" +
+      "vid_screenresolution             desktop\n" +
+      "vid_windowpos                    centered\n" +
+      "vid_windowsize                   960x600\n" +
+      "r_screensize                     8\n" +
+      "EOF\n" +
+      "else " +
+      "  sed -i 's/^vid_fullscreen\\s\\+on$/vid_fullscreen                   off/' \"$CFG\" 2>/dev/null; " +
+      "  sed -i 's/^vid_windowsize\\s\\+.*/vid_windowsize                   960x600/' \"$CFG\" 2>/dev/null; " +
+      "fi; " +
       "for b in doomretro chocolate-doom gzdoom prboom-plus; do " +
       "  if command -v $b >/dev/null 2>&1; then " +
       "    if [ -n \"" + root.detectedWad + "\" ]; then exec $b -iwad \"" + root.detectedWad + "\"; " +
