@@ -1,4 +1,4 @@
-# Building Omarchy Dino: Engineering an In-Bar Retro Arcade for Omarchy Quattro
+# Building Omarchy Arcade: Engineering an In-Bar Retro Engine for Omarchy Quattro
 
 > **A deep dive into crafting a zero-latency, embedded gaming popup inside Omarchy's Wayland desktop environment.**
 
@@ -13,21 +13,24 @@
    - [Stage 4: Edge-to-Edge Proportions & Dynamic Square Aspect Ratio](#stage-4-edge-to-edge-proportions--dynamic-square-aspect-ratio)
    - [Stage 5: Status Bar Placement & Optical Glyph Centering](#stage-5-status-bar-placement--optical-glyph-centering)
    - [Stage 6: Public Release & Open Source Packaging](#stage-6-public-release--open-source-packaging)
+   - [Stage 7: OutRun 3D Road Racer & Clutter-Free Hotkey Switching](#stage-7-outrun-3d-road-racer--clutter-free-hotkey-switching)
 3. [Technical Architecture](#-technical-architecture)
 
 ---
 
 ## 🌟 Executive Summary
 
-**Omarchy Dino** is a standalone, lightweight, zero-latency desktop widget for [Omarchy Quattro](https://omarchy.org). It embeds the iconic **Chrome Dinosaur Runner** directly inside the Wayland status bar. 
+**Omarchy Arcade** is a standalone, lightweight, zero-latency desktop widget for [Omarchy Quattro](https://omarchy.org). It embeds retro classics—**Jake Gordon's OutRun 3D Road Racer** and the iconic **Chrome Dinosaur Runner**—directly inside the Wayland status bar. 
 
-Unlike traditional Linux game launchers that spawn heavy X11/Wayland windows, Omarchy Dino renders **100% inside Quickshell's hardware-accelerated layer-shell popup**. It uses 0% CPU and negligible RAM when closed, and responds instantly upon clicking the status bar icon.
+Unlike traditional Linux game launchers that spawn heavy X11/Wayland windows, Omarchy Arcade renders **100% inside Quickshell's hardware-accelerated layer-shell popup**. It uses 0% CPU and negligible RAM when closed, and responds instantly upon clicking the status bar icon.
 
 | Key Metric | Value |
 | :--- | :--- |
 | **Target Shell** | Omarchy Quattro / Quickshell (Qt 6 QML) |
 | **Engine** | Pure V8 JavaScript Physics + Qt Quick GPU Scene Graph |
 | **FPS Target** | 60 FPS Ultra-Smooth |
+| **Included Games** | OutRun 3D Racer *(Default)* & Chrome Dinosaur |
+| **Switching** | Instant hotkey (`Tab` or `G`) with 0 on-screen UI clutter |
 | **Idle CPU / RAM** | 0.0% CPU / < 4 MB RAM |
 | **GitHub Repository** | [https://github.com/oppenheimer-rick/omarchy-dino](https://github.com/oppenheimer-rick/omarchy-dino) |
 
@@ -70,18 +73,16 @@ Next, we completely gutted all non-game code (database scripts, tracking logic, 
 ---
 
 ### Stage 3: Porting & Rewriting the Game Engine
-We cloned the PyGame reference implementation (`MaxRohowsky/chrome-dinosaur`) and discovered that running Python/PyGame inside Wayland creates external window fragmentation and awkward coordinate voids. 
-
-We completely ported the physics state machine into **pure V8 JavaScript (`Model.js`)** and native **Qt Quick Image sprites (`DinoGame.qml`)**:
+We started with the Chrome Dinosaur runner, porting the physics state machine into **pure V8 JavaScript (`Model.js`)** and native **Qt Quick Image sprites (`DinoGame.qml`)**:
 - Ported authentic jump trajectories, gravity arcs, and ducking hitboxes.
-- Tested using a Node.js automated test suite (`test/model.test.mjs`), achieving 4/4 passing tests in 25ms.
+- Tested using a Node.js automated test suite (`test/model.test.mjs`), achieving passing unit tests.
 
 ![Authentic Dino game running edge-to-edge](docs/images/stage3_dino_game.png)
 
 ---
 
 ### Stage 4: Edge-to-Edge Proportions & Dynamic Square Aspect Ratio
-Early prototypes suffered from excess whitespace and awkward PyGame proportions. We re-anchored the ground line (`groundY = height - 20`) and built a **dynamic square viewport (380×320)** that automatically adapts to any container aspect ratio.
+We re-anchored coordinates and built a **dynamic square viewport (380×320)** that automatically adapts to any container aspect ratio without empty voids.
 
 ![Dynamic square gameplay](docs/images/stage4_gameplay.png)
 
@@ -109,6 +110,19 @@ We observed that standard FontAwesome icons (`fa-dragon`) are horizontally elong
 
 ---
 
+### Stage 7: OutRun 3D Road Racer & Clutter-Free Hotkey Switching
+To expand beyond a single title into an arcade vault without adding visual clutter:
+1. **Ported Jake Gordon's OutRun 3D Engine (`RacerModel.js` & `RacerGame.qml`)**:
+   - 3D perspective projection (`project(p, cameraX, cameraY, cameraZ, cameraDepth, roadWidth)`)
+   - Curvature acceleration, centrifugal force simulation, and hill elevation arcs.
+   - Parallax sky, hills, and tree background layer scrolling with `background.png`.
+   - Sliced roadside billboards (`Code inComplete`, `LiquidPlanner`), palm trees, and AI opponent traffic cars from `sprites.png`.
+2. **Zero-UI Hotkey Switching**:
+   - Stripped away on-screen buttons and menus.
+   - Pressing **`Tab`** or **`G`** instantly toggles between **OutRun Racer** and **Dino Runner** seamlessly.
+
+---
+
 ## 🏗️ Technical Architecture
 
 ```mermaid
@@ -116,7 +130,11 @@ graph TD
     BarWidget["BarWidget.qml (Top Bar)"] -->|Loads / Injects| Panel["Panel.qml (Popup Window)"]
     BarWidget -->|Displays| Icon["BarIconButton (Space Invader / 1:1 Glyph)"]
     Panel -->|Wraps| KeyCatcher["PanelKeyCatcher (Keystroke Router)"]
-    KeyCatcher -->|Renders| DinoGame["DinoGame.qml (60 FPS Scene Graph)"]
-    DinoGame -->|Reads State| Model["Model.js (Physics & Collision Engine)"]
-    DinoGame -->|Loads| Assets["Assets/ (Dino, Cacti, Bird, Track, Clouds)"]
+    KeyCatcher -->|Routes Tab/G| Switcher{"Active Game Selector"}
+    Switcher -->|Racer Mode| Racer["RacerGame.qml (3D Road Engine)"]
+    Switcher -->|Dino Mode| Dino["DinoGame.qml (2D Sprite Runner)"]
+    Racer -->|Reads Math| RacerModel["RacerModel.js (3D Perspective Math)"]
+    Racer -->|Draws Assets| RacerAssets["Assets/Racer/ (background.png, sprites.png)"]
+    Dino -->|Reads Math| DinoModel["Model.js (Physics Engine)"]
+    Dino -->|Draws Assets| DinoAssets["Assets/Dino/ (Sprites)"]
 ```

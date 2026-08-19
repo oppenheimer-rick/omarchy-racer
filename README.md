@@ -1,13 +1,13 @@
-# Omarchy Dino Runner
+# Omarchy Arcade
 
-> 🦖 **Zero-latency in-bar retro runner game for [Omarchy](https://omarchy.org).**
+> 🏎️ **Zero-latency in-bar retro arcade hub (OutRun 3D Racer & Chrome Dino) for [Omarchy](https://omarchy.org).**
 
 *<span style="color: #888888;">[📖 Read the Full Engineering & Architecture Documentation](DOCUMENTATION.md) →</span>*
 
 ---
 
 <p align="center">
-  <img src="docs/videos/showcase.gif" alt="Omarchy Dino Gameplay Showcase" width="100%" />
+  <img src="docs/videos/showcase.gif" alt="Omarchy Arcade Gameplay Showcase" width="100%" />
 </p>
 
 ---
@@ -22,21 +22,45 @@ omarchy plugin add https://github.com/oppenheimer-rick/omarchy-dino.git --enable
 
 ---
 
+## 🕹️ Included Games & Switching
+
+You can switch between games instantly at any time without menus or extra screen clutter by pressing **`Tab`** or **`G`**:
+
+1. **🏎️ OutRun 3D Road Racer** *(Default)*: Authentic pseudo-3D road racer with curves, hills, parallax sky/mountains, traffic AI, and roadside billboards.
+2. **🦖 Chrome Dinosaur Runner**: The classic jump-and-duck endless runner with authentic physics and speed acceleration.
+
+---
+
 ## 🎮 Controls
 
+### 🔄 Global Switcher
+| Key | Action |
+| :--- | :--- |
+| **`TAB` / `G`** | **Switch between OutRun Racer & Dino Runner** |
+| **`ESC`** | Close popup window |
+
+### 🏎️ OutRun 3D Racer *(Default)*
+| Key / Input | Action |
+| :--- | :--- |
+| **`↑` / `W`** | Accelerate |
+| **`↓` / `S`** | Brake / Slow down |
+| **`←` `→` / `A` `D`** | Steer Left / Right |
+| **`P`** | Pause / Resume |
+| **`R`** | Restart Race |
+
+### 🦖 Chrome Dinosaur Runner
 | Key / Input | Action |
 | :--- | :--- |
 | **`SPACE` / `↑` / `W` / Click** | Jump / Start game |
 | **`↓` / `S`** | Duck |
 | **`P`** | Pause / Resume |
 | **`R`** | Restart |
-| **`ESC`** | Close popup |
 
 ---
 
 ## ✨ Features
 
-- **⚡ Zero-Latency Native Execution**: Powered directly by Quickshell's V8 engine and GPU-accelerated Qt Quick scene graph.
+- **⚡ Zero-Latency Native Execution**: Powered directly by Quickshell's V8 engine and GPU-accelerated Qt Quick Canvas 2D.
 - **🎯 Dynamic Square Viewport**: Clean 380×320 square card designed to fit naturally on any monitor resolution.
 - **👾 Retro 8-Bit Pixel Bar Icon**: Uses JetBrainsMono Nerd Font Space Invader glyph (`\udb82\udfc9`) with optical centering.
 - **🛡️ 0% Idle Resource Usage**: Completely sleeps when closed, consuming zero CPU cycles and negligible memory.

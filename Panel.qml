@@ -3,7 +3,7 @@ import Quickshell
 import qs.Commons
 import qs.Ui
 
-// Omarchy Retro Arcade Popup Window.
+// Omarchy Retro Arcade Popup Window (Dino & OutRun Racer).
 Panel {
   id: root
   moduleName: "io.github.oppenheimer-rick.omarchy-dino"
@@ -13,8 +13,8 @@ Panel {
   property var hostWidget: null
   readonly property var barIdentity: hostWidget || root
 
-  // Active Game: "dino" or "asteroids"
-  property string currentGame: "dino"
+  // Active Game: "racer" (default) or "dino"
+  property string currentGame: "racer"
 
   // Aspect ratio configuration: clean 380x320 square card
   readonly property int targetWidth: Style.space(380)
@@ -35,7 +35,7 @@ Panel {
 
   function switchGame() {
     if (root.currentGame === "dino") {
-      root.currentGame = "asteroids"
+      root.currentGame = "racer"
     } else {
       root.currentGame = "dino"
     }
@@ -58,7 +58,7 @@ Panel {
       onCloseRequested: root.close()
 
       Keys.onPressed: function(event) {
-        // Quick switch shortcut: Tab or G toggles between Dino and Asteroids
+        // Quick switch shortcut: Tab or G toggles between Dino and OutRun Racer
         if (event.key === Qt.Key_Tab || event.key === Qt.Key_G) {
           root.switchGame()
           event.accepted = true
@@ -70,8 +70,8 @@ Panel {
             event.accepted = true
             return
           }
-        } else if (root.currentGame === "asteroids" && asteroidsLoader.item) {
-          if (asteroidsLoader.item.handleKeyPress(event)) {
+        } else if (root.currentGame === "racer" && racerLoader.item) {
+          if (racerLoader.item.handleKeyPress(event)) {
             event.accepted = true
             return
           }
@@ -83,8 +83,8 @@ Panel {
           if (dinoLoader.item.handleKeyRelease(event)) {
             event.accepted = true
           }
-        } else if (root.currentGame === "asteroids" && asteroidsLoader.item) {
-          if (asteroidsLoader.item.handleKeyRelease(event)) {
+        } else if (root.currentGame === "racer" && racerLoader.item) {
+          if (racerLoader.item.handleKeyRelease(event)) {
             event.accepted = true
           }
         }
@@ -106,11 +106,11 @@ Panel {
         }
 
         Loader {
-          id: asteroidsLoader
+          id: racerLoader
           anchors.fill: parent
-          active: root.currentGame === "asteroids"
+          active: root.currentGame === "racer"
           visible: active
-          sourceComponent: AsteroidsGame {}
+          sourceComponent: RacerGame {}
         }
       }
     }
