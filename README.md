@@ -2,7 +2,7 @@
 
 > 🦖 **Zero-latency in-bar retro runner game for [Omarchy](https://omarchy.org).**
 
-Play the iconic Chrome Dinosaur runner directly inside your Omarchy status bar. Click the pixel dragon icon or press a shortcut to open an instant 60 FPS popup with zero CPU/RAM background overhead.
+*<span style="color: #888888;">[📖 Read the Full Engineering & Architecture Documentation](DOCUMENTATION.md) →</span>*
 
 ---
 
@@ -32,7 +32,7 @@ omarchy plugin add https://github.com/oppenheimer-rick/omarchy-dino.git --enable
 
 - **⚡ Zero-Latency Native Execution**: Powered directly by Quickshell's V8 engine and GPU-accelerated Qt Quick scene graph.
 - **🎯 Dynamic Square Viewport**: Clean 380×320 square card designed to fit naturally on any monitor resolution.
-- **🐉 Pixel Dragon Bar Icon**: Uses JetBrainsMono Nerd Font glyph (`\ueef8` / `fa-dragon`) with optical centering.
+- **👾 Retro 8-Bit Pixel Bar Icon**: Uses JetBrainsMono Nerd Font Space Invader glyph (`\udb82\udfc9`) with optical centering.
 - **🛡️ 0% Idle Resource Usage**: Completely sleeps when closed, consuming zero CPU cycles and negligible memory.
 - **🎛️ Configurable Bar Placement**: Easily switch between **Right** and **Center** status bar positioning.
 
