@@ -6,6 +6,10 @@
 
 ---
 
+![Omarchy Dino Gameplay Showcase](docs/videos/showcase.gif)
+
+---
+
 ## 📦 Install
 
 ```bash
