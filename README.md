@@ -6,7 +6,9 @@
 
 ---
 
-![Omarchy Dino Gameplay Showcase](docs/videos/showcase.gif)
+<p align="center">
+  <img src="docs/videos/showcase.gif" alt="Omarchy Dino Gameplay Showcase" width="100%" />
+</p>
 
 ---
 
