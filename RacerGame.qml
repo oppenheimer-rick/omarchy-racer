@@ -112,19 +112,20 @@ Item {
       var cameraY = gameState.cameraHeight + playerY
       var cameraZ = gameState.position - (basePercent * gameState.segmentLength)
 
-      // 1. Draw Parallax Background Layers
+      // 1. Full-Height Solid Ground & Sky Base
+      ctx.fillStyle = "#72D7EE"
+      ctx.fillRect(0, 0, w, h * 0.55)
+      ctx.fillStyle = "#10AA10"
+      ctx.fillRect(0, h * 0.45, w, h * 0.55)
+
+      // 2. Draw Parallax Background (Seamless 3-Layer Panoramic Scroll)
       if (root.assetsLoaded) {
-        renderBackground(ctx, root.bgSource, w, h, Model.BACKGROUND.SKY, gameState.skyOffset, Model.BACKGROUND.SKY.h * 0.001 * playerY)
-        renderBackground(ctx, root.bgSource, w, h, Model.BACKGROUND.HILLS, gameState.hillOffset, Model.BACKGROUND.HILLS.h * 0.002 * playerY)
-        renderBackground(ctx, root.bgSource, w, h, Model.BACKGROUND.TREES, gameState.treeOffset, Model.BACKGROUND.TREES.h * 0.003 * playerY)
-      } else {
-        ctx.fillStyle = "#72D7EE"
-        ctx.fillRect(0, 0, w, h / 2)
-        ctx.fillStyle = "#10AA10"
-        ctx.fillRect(0, h / 2, w, h / 2)
+        renderBackground(ctx, root.bgSource, w, h, Model.BACKGROUND.SKY, gameState.skyOffset, 0)
+        renderBackground(ctx, root.bgSource, w, h, Model.BACKGROUND.HILLS, gameState.hillOffset, 0)
+        renderBackground(ctx, root.bgSource, w, h, Model.BACKGROUND.TREES, gameState.treeOffset, 0)
       }
 
-      // 2. Draw 3D Road Segments
+      // 3. Draw 3D Road Segments (Back-to-Front Projection)
       var maxy = h
       var x = 0
       var dx = -(baseSegment.curve * basePercent)
@@ -133,6 +134,7 @@ Item {
         var segment = gameState.segments[(baseSegment.index + n) % gameState.segments.length]
         var looped = segment.index < baseSegment.index
         segment.clip = maxy
+        segment.fog = Model.exponentialFog(n / gameState.drawDistance, gameState.fogDensity)
 
         Model.project(segment.p1, cameraX - x, cameraY, cameraZ - (looped ? gameState.trackLength : 0), gameState.cameraDepth, w, h, gameState.roadWidth)
         Model.project(segment.p2, cameraX - x - dx, cameraY, cameraZ - (looped ? gameState.trackLength : 0), gameState.cameraDepth, w, h, gameState.roadWidth)
@@ -145,7 +147,7 @@ Item {
 
         // Grass Poly
         ctx.fillStyle = segment.color.grass
-        ctx.fillRect(0, segment.p2.screen.y, w, segment.p1.screen.y - segment.p2.screen.y)
+        ctx.fillRect(0, segment.p2.screen.y, w, segment.p1.screen.y - segment.p2.screen.y + 1)
 
         // Rumble Poly
         var r1 = segment.p1.screen.w / Math.max(6, 2 * gameState.lanes)
@@ -170,10 +172,18 @@ Item {
           }
         }
 
+        // Atmospheric Fog
+        if (segment.fog < 1) {
+          ctx.globalAlpha = (1 - segment.fog) * 0.65
+          ctx.fillStyle = Model.COLORS.FOG
+          ctx.fillRect(0, segment.p2.screen.y, w, segment.p1.screen.y - segment.p2.screen.y + 1)
+          ctx.globalAlpha = 1
+        }
+
         maxy = segment.p1.screen.y
       }
 
-      // 3. Draw Roadside Sprites, Traffic Cars, and Player Car (Back-to-Front)
+      // 4. Draw Roadside Billboards, Trees, Traffic, and Player (Back-to-Front)
       if (root.assetsLoaded) {
         for (var sn = gameState.drawDistance - 1; sn > 0; sn--) {
           var seg = gameState.segments[(baseSegment.index + sn) % gameState.segments.length]
@@ -196,7 +206,7 @@ Item {
             renderSprite(ctx, root.spritesSource, w, h, gameState.roadWidth, sp.source, spScale, spX, spY, (sp.offset < 0 ? -1 : 0), -1, seg.clip)
           }
 
-          // Player Car
+          // Player Ferrari
           if (seg === playerSegment) {
             var steer = gameState.keyLeft ? -1 : (gameState.keyRight ? 1 : 0)
             var updown = playerSegment.p2.world.y - playerSegment.p1.world.y
@@ -207,27 +217,30 @@ Item {
 
             var pScale = gameState.cameraDepth / gameState.playerZ
             var pDestX = w / 2
-            var pDestY = (h / 2) - (pScale * Model.interpolate(playerSegment.p1.camera.y, playerSegment.p2.camera.y, playerPercent) * h / 2)
+            var speedRatio = gameState.speed / gameState.maxSpeed
+            var bounce = (1.5 * Math.random() * speedRatio) * (Math.random() > 0.5 ? 1 : -1)
+            var pDestY = (h / 2) - (pScale * Model.interpolate(playerSegment.p1.camera.y, playerSegment.p2.camera.y, playerPercent) * h / 2) + bounce
 
             renderSprite(ctx, root.spritesSource, w, h, gameState.roadWidth, playerSprite, pScale, pDestX, pDestY, -0.5, -1, null)
           }
         }
       }
 
-      // 4. Authentic Vector HUD (Top Speed & Time)
+      // 5. Retro Digital HUD
       var mph = Math.round((gameState.speed / gameState.maxSpeed) * 180)
-      ctx.fillStyle = "rgba(0, 0, 0, 0.45)"
-      ctx.fillRect(8, 8, 110, 24)
-      ctx.fillRect(w - 108, 8, 100, 24)
+      ctx.fillStyle = "rgba(0, 0, 0, 0.55)"
+      ctx.fillRect(8, 8, 105, 24)
+      ctx.fillRect(w - 105, 8, 97, 24)
 
-      ctx.fillStyle = "#ffffff"
+      ctx.fillStyle = "#ffff00"
       ctx.font = "bold 12px monospace"
       ctx.textAlign = "left"
-      ctx.fillText(mph + " MPH", 16, 24)
+      ctx.fillText(mph + " MPH", 14, 24)
 
       var timeStr = (gameState.currentLapTime).toFixed(1) + "s"
+      ctx.fillStyle = "#00ffff"
       ctx.textAlign = "right"
-      ctx.fillText("TIME " + timeStr, w - 16, 24)
+      ctx.fillText(timeStr, w - 14, 24)
     }
 
     function renderBackground(ctx, bgImage, width, height, layer, rotation, offset) {
@@ -245,7 +258,7 @@ Item {
       var destX = 0
       var destY = offset
       var destW = Math.floor(width * (sourceW / imageW))
-      var destH = height / 2
+      var destH = Math.floor(height * 0.5)
 
       ctx.drawImage(bgImage, sourceX, sourceY, sourceW, sourceH, destX, destY, destW, destH)
       if (sourceW < imageW)
