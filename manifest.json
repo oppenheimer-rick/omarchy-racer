@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "id": "io.github.oppenheimer-rick.omarchy-dino",
-  "name": "Omarchy Dino",
-  "version": "1.0.0",
+  "name": "Omarchy Arcade",
+  "version": "1.1.0",
   "author": "oppenheimer-rick",
   "license": "MIT",
-  "description": "Zero-latency in-bar Chrome Dinosaur game popup for Omarchy Quattro.",
+  "description": "Zero-latency in-bar retro arcade game popup for Omarchy Quattro.",
   "kinds": [
     "bar-widget"
   ],
@@ -13,8 +13,8 @@
     "barWidget": "BarWidget.qml"
   },
   "barWidget": {
-    "displayName": "Omarchy Dino",
-    "description": "Retro Chrome Dino runner game directly inside your status bar.",
+    "displayName": "Omarchy Arcade",
+    "description": "Retro in-bar arcade mini-games (Chrome Dino & Pac-Man).",
     "category": "Games",
     "allowMultiple": false,
     "defaultSection": "right",

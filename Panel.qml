@@ -3,7 +3,7 @@ import Quickshell
 import qs.Commons
 import qs.Ui
 
-// Omarchy Dino Popup Window.
+// Omarchy Retro Arcade Popup Window.
 Panel {
   id: root
   moduleName: "io.github.oppenheimer-rick.omarchy-dino"
@@ -13,11 +13,12 @@ Panel {
   property var hostWidget: null
   readonly property var barIdentity: hostWidget || root
 
-  // Aspect ratio configuration: "square" (380x320) or "banner" (520x160)
-  property string aspectRatio: "square"
+  // Active Game: "dino" or "asteroids"
+  property string currentGame: "dino"
 
-  readonly property int targetWidth: aspectRatio === "square" ? Style.space(380) : Style.space(520)
-  readonly property int targetHeight: aspectRatio === "square" ? Style.space(320) : Style.space(160)
+  // Aspect ratio configuration: clean 380x320 square card
+  readonly property int targetWidth: Style.space(380)
+  readonly property int targetHeight: Style.space(320)
 
   function open() {
     root.controller.show()
@@ -32,10 +33,12 @@ Panel {
     else root.open()
   }
 
-  function switchPanel(direction) {
-    if (root.bar && typeof root.bar.switchPanelFrom === "function")
-      return root.bar.switchPanelFrom(root.barIdentity, direction)
-    return false
+  function switchGame() {
+    if (root.currentGame === "dino") {
+      root.currentGame = "asteroids"
+    } else {
+      root.currentGame = "dino"
+    }
   }
 
   KeyboardPanel {
@@ -53,30 +56,61 @@ Panel {
       id: keyCatcher
       anchors.fill: parent
       onCloseRequested: root.close()
-      onTabRequested: function(direction) { root.switchPanel(direction) }
 
       Keys.onPressed: function(event) {
-        if (dinoGame.handleKeyPress(event)) {
+        // Quick switch shortcut: Tab or G toggles between Dino and Asteroids
+        if (event.key === Qt.Key_Tab || event.key === Qt.Key_G) {
+          root.switchGame()
           event.accepted = true
+          return
+        }
+
+        if (root.currentGame === "dino" && dinoLoader.item) {
+          if (dinoLoader.item.handleKeyPress(event)) {
+            event.accepted = true
+            return
+          }
+        } else if (root.currentGame === "asteroids" && asteroidsLoader.item) {
+          if (asteroidsLoader.item.handleKeyPress(event)) {
+            event.accepted = true
+            return
+          }
         }
       }
 
       Keys.onReleased: function(event) {
-        if (dinoGame.handleKeyRelease(event)) {
-          event.accepted = true
+        if (root.currentGame === "dino" && dinoLoader.item) {
+          if (dinoLoader.item.handleKeyRelease(event)) {
+            event.accepted = true
+          }
+        } else if (root.currentGame === "asteroids" && asteroidsLoader.item) {
+          if (asteroidsLoader.item.handleKeyRelease(event)) {
+            event.accepted = true
+          }
         }
       }
 
-      // Edge-to-edge game canvas
+      // Edge-to-edge game canvas (zero extra text or headers)
       Rectangle {
         anchors.fill: parent
         radius: Style.cornerRadius > 0 ? Style.cornerRadius : 6
-        color: "#f7f7f7"
+        color: root.currentGame === "dino" ? "#f7f7f7" : "#000000"
         clip: true
 
-        DinoGame {
-          id: dinoGame
+        Loader {
+          id: dinoLoader
           anchors.fill: parent
+          active: root.currentGame === "dino"
+          visible: active
+          sourceComponent: DinoGame {}
+        }
+
+        Loader {
+          id: asteroidsLoader
+          anchors.fill: parent
+          active: root.currentGame === "asteroids"
+          visible: active
+          sourceComponent: AsteroidsGame {}
         }
       }
     }
