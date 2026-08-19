@@ -9,8 +9,8 @@ BarWidget {
   id: root
   moduleName: "io.github.oppenheimer-rick.omarchy-dino"
 
-  // 1:1 Square Pixel Dragon glyph in JetBrainsMono Nerd Font (md-dragon: \udb80\udf22)
-  readonly property string icon: "\udb80\udf22"
+  // Retro Space Invader Pixel Icon in JetBrainsMono Nerd Font (md-space_invaders: \udb82\udfc9)
+  readonly property string icon: "\udb82\udfc9"
   readonly property bool opened: panelLoader.item ? panelLoader.item.opened === true : false
 
   function open() {
