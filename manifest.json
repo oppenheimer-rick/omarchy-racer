@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.oppenheimer-rick.omarchy-dino",
+  "name": "Omarchy Dino",
+  "version": "1.0.0",
+  "author": "oppenheimer-rick",
+  "license": "MIT",
+  "description": "Zero-latency in-bar Chrome Dinosaur game popup for Omarchy Quattro.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Omarchy Dino",
+    "description": "Retro Chrome Dino runner game directly inside your status bar.",
+    "category": "Games",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "position": "right"
+    },
+    "schema": [
+      {
+        "key": "position",
+        "type": "string",
+        "label": "Bar Position",
+        "options": [
+          "right",
+          "center"
+        ],
+        "default": "right"
+      }
+    ]
+  }
+}
