@@ -7,7 +7,7 @@
 ---
 
 <p align="center">
-  <img src="docs/videos/showcase.gif" alt="Omarchy Racer Gameplay Showcase" width="100%" />
+  <img src="docs/videos/racer-showcase.gif" alt="Omarchy Racer Gameplay Showcase" width="100%" />
 </p>
 
 ---

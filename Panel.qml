@@ -220,20 +220,20 @@ Panel {
           Rectangle {
             anchors.fill: parent
             gradient: Gradient {
-              GradientStop { position: 0.0; color: "#40000000" }
-              GradientStop { position: 0.55; color: "#66000000" }
-              GradientStop { position: 1.0; color: "#d9000000" }
+              GradientStop { position: 0.0; color: "#33000000" }
+              GradientStop { position: 0.5; color: "#55000000" }
+              GradientStop { position: 1.0; color: "#e6000000" }
             }
           }
 
-          // Single Epic DOOM Launch Button
+          // Sharp Sleek Black & Red Border DOOM Button
           MouseArea {
             id: btnMouse
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 24
             anchors.horizontalCenter: parent.horizontalCenter
             width: 220
-            height: 48
+            height: 44
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onClicked: root.launchDoom()
@@ -241,13 +241,13 @@ Panel {
             Rectangle {
               id: doomBtn
               anchors.fill: parent
-              radius: 8
-              color: root.isDoomRunning ? "#550000" : (btnMouse.containsMouse ? "#cc1111" : "#990000")
-              border.color: root.isDoomRunning ? "#ff5555" : (btnMouse.containsMouse ? "#ffcc00" : "#ff3333")
-              border.width: 2
+              radius: 0
+              color: root.isDoomRunning ? "#1a0000" : (btnMouse.containsMouse ? "#111111" : "#000000")
+              border.color: root.isDoomRunning ? "#ff2222" : (btnMouse.containsMouse ? "#ff1a40" : "#cc0022")
+              border.width: 1.5
 
-              Behavior on color { ColorAnimation { duration: 120 } }
-              Behavior on border.color { ColorAnimation { duration: 120 } }
+              Behavior on color { ColorAnimation { duration: 100 } }
+              Behavior on border.color { ColorAnimation { duration: 100 } }
 
               Row {
                 anchors.centerIn: parent
@@ -256,16 +256,17 @@ Panel {
                 Text {
                   anchors.verticalCenter: parent.verticalCenter
                   text: root.isDoomRunning ? "🔥" : "💀"
-                  font.pixelSize: 18
+                  font.pixelSize: 16
                 }
 
                 Text {
                   anchors.verticalCenter: parent.verticalCenter
                   text: root.isDoomRunning ? "KILL DOOM" : "RIP AND TEAR"
                   font.family: Style.font.family
-                  font.pixelSize: 15
+                  font.pixelSize: 14
                   font.bold: true
-                  color: "#ffffff"
+                  font.letterSpacing: 2
+                  color: root.isDoomRunning ? "#ff5555" : (btnMouse.containsMouse ? "#ffffff" : "#dddddd")
                 }
               }
             }
