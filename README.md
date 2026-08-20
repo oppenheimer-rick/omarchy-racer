@@ -1,6 +1,6 @@
 # Omarchy Racer & Arcade
 
-> 🏎️ **Zero-latency in-bar OutRun 3D road racer, Chrome Dino, and DOOM for [Omarchy](https://omarchy.org).**
+> 🏎️ **Zero-latency in-bar OutRun 3D road racer, Chrome Dino, and 3D DOOM for [Omarchy](https://omarchy.org).**
 
 *<span style="color: #888888;">[📖 Read the Full Engineering & Architecture Documentation](DOCUMENTATION.md) →</span>*
 
@@ -28,16 +28,17 @@ You can switch between games instantly at any time without menus or extra screen
 
 1. **🏎️ OutRun 3D Road Racer** *(Default)*: Authentic pseudo-3D road racer with procedural infinite tracks, hills, curves, parallax sky/mountains, traffic AI, and roadside billboards.
 2. **🦖 Chrome Dinosaur Runner**: The classic jump-and-duck endless runner with authentic physics and speed acceleration.
-3. **🔥 DOOM**: Quick-launch into DOOM via auto-detected WADs and high-performance Wayland source ports (`doomretro`, `chocolate-doom`, `gzdoom`).
+3. **🔥 3D DOOM**: Playable directly **inside the compact popup card** with 3D raycasting, demons, shotgun with muzzle flash, health/armor/ammo HUD, and instant **`F11` fullscreen support**!
 
 ---
 
 ## 🎮 Controls
 
-### 🔄 Global Switcher
+### 🔄 Global Switcher & Fullscreen
 | Key | Action |
 | :--- | :--- |
-| **`TAB` / `G`** | **Cycle between OutRun Racer, Dino Runner, and DOOM** |
+| **`TAB` / `G`** | **Cycle between OutRun Racer, Dino Runner, and 3D DOOM** |
+| **`F11`** | **Toggle Fullscreen (Switch between compact card and full display)** |
 | **`ESC`** | Close popup window |
 
 ### 🏎️ OutRun 3D Racer *(Default)*
@@ -57,10 +58,16 @@ You can switch between games instantly at any time without menus or extra screen
 | **`P`** | Pause / Resume |
 | **`R`** | Restart |
 
-### 🔥 DOOM
+### 🔥 3D DOOM *(Embedded In-Card & Fullscreen)*
 | Key / Input | Action |
 | :--- | :--- |
-| **`ENTER` / `SPACE` / Click** | Launch DOOM (Rip and Tear) |
+| **`W` / `↑`** | Move Forward |
+| **`S` / `↓`** | Move Backward |
+| **`A` / `D` or `←` `→`** | Turn Left / Right |
+| **`Q` / `E`** | Strafe Left / Right |
+| **`SPACE` / `Ctrl` / `ENTER`** | **Fire Shotgun (Rip and Tear)** |
+| **`F11`** | Toggle Fullscreen / Popup mode |
+| **`R`** | Restart Level |
 
 ---
 

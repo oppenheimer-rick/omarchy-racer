@@ -1,10 +1,9 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import qs.Commons
 import qs.Ui
 
-// Omarchy Retro Arcade Popup Window (OutRun 3D Racer, Chrome Dino, & DOOM).
+// Omarchy Retro Arcade Popup Window (OutRun 3D Racer, Chrome Dino, & 3D DOOM).
 Panel {
   id: root
   moduleName: "io.github.oppenheimer-rick.omarchy-racer"
@@ -16,11 +15,11 @@ Panel {
 
   // Active Game: "racer" (default), "dino", or "doom"
   property string currentGame: "racer"
-  property string detectedWad: ""
+  property bool isFullscreen: false
 
-  // Clean compact square card aspect ratio
-  readonly property int targetWidth: Style.space(380)
-  readonly property int targetHeight: Style.space(320)
+  // Dynamic Viewport Size: Compact 380x320 popup or F11 Fullscreen
+  readonly property int targetWidth: isFullscreen ? (root.bar && root.bar.screen ? root.bar.screen.width : 1280) : Style.space(380)
+  readonly property int targetHeight: isFullscreen ? (root.bar && root.bar.screen ? (root.bar.screen.height - 40) : 800) : Style.space(320)
 
   function open() {
     root.controller.show()
@@ -35,6 +34,10 @@ Panel {
     else root.open()
   }
 
+  function toggleFullscreen() {
+    root.isFullscreen = !root.isFullscreen
+  }
+
   function switchGame() {
     if (root.currentGame === "racer") {
       root.currentGame = "dino"
@@ -43,61 +46,6 @@ Panel {
     } else {
       root.currentGame = "racer"
     }
-  }
-
-  // WAD auto-detection process
-  Process {
-    id: wadDetector
-    command: ["bash", "-c",
-      "for d in ~/Games/doom ~/doom ~/.local/share/doom /usr/share/doom; do " +
-      "  for f in \"$d\"/DOOM*.WAD \"$d\"/doom*.wad; do " +
-      "    [ -f \"$f\" ] && echo \"$f\" && exit 0; " +
-      "  done; " +
-      "done; exit 1"]
-    stdout: StdioCollector {
-      waitForEnd: true
-      onStreamFinished: {
-        var path = String(text || "").trim()
-        if (path.length > 0) root.detectedWad = path
-      }
-    }
-  }
-
-  Process {
-    id: doomProcess
-  }
-
-  function launchDoom() {
-    var cmd = ["bash", "-c",
-      "CFG=\"$HOME/.config/doomretro/doomretro.cfg\"; " +
-      "if [ ! -f \"$CFG\" ]; then " +
-      "  mkdir -p \"$(dirname \"$CFG\")\"; " +
-      "  cat > \"$CFG\" << 'EOF'\n" +
-      "vid_fullscreen                   off\n" +
-      "vid_widescreen                   on\n" +
-      "vid_borderlesswindow             off\n" +
-      "vid_screenresolution             desktop\n" +
-      "vid_windowpos                    centered\n" +
-      "vid_windowsize                   960x600\n" +
-      "r_screensize                     8\n" +
-      "EOF\n" +
-      "else " +
-      "  sed -i 's/^vid_fullscreen\\s\\+on$/vid_fullscreen                   off/' \"$CFG\" 2>/dev/null; " +
-      "  sed -i 's/^vid_windowsize\\s\\+.*/vid_windowsize                   960x600/' \"$CFG\" 2>/dev/null; " +
-      "fi; " +
-      "for b in doomretro chocolate-doom gzdoom prboom-plus; do " +
-      "  if command -v $b >/dev/null 2>&1; then " +
-      "    if [ -n \"" + root.detectedWad + "\" ]; then exec $b -iwad \"" + root.detectedWad + "\"; " +
-      "    else exec $b; fi; " +
-      "  fi; " +
-      "done; " +
-      "notify-send 'DOOM Engine' 'Please install doomretro or chocolate-doom (e.g. sudo pacman -S doomretro)'; exit 1"]
-    doomProcess.command = cmd
-    doomProcess.running = true
-  }
-
-  Component.onCompleted: {
-    wadDetector.running = true
   }
 
   KeyboardPanel {
@@ -111,12 +59,22 @@ Panel {
     contentWidth: panel.fittedContentWidth(root.targetWidth)
     contentHeight: panel.fittedContentHeight(root.targetHeight)
 
+    Behavior on contentWidth { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+    Behavior on contentHeight { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+
     PanelKeyCatcher {
       id: keyCatcher
       anchors.fill: parent
       onCloseRequested: root.close()
 
       Keys.onPressed: function(event) {
+        // Fullscreen Toggle: F11
+        if (event.key === Qt.Key_F11) {
+          root.toggleFullscreen()
+          event.accepted = true
+          return
+        }
+
         // Quick switch shortcut: Tab or G cycles between Racer, Dino, and DOOM
         if (event.key === Qt.Key_Tab || event.key === Qt.Key_G) {
           root.switchGame()
@@ -134,9 +92,8 @@ Panel {
             event.accepted = true
             return
           }
-        } else if (root.currentGame === "doom") {
-          if (event.key === Qt.Key_Return || event.key === Qt.Key_Space) {
-            root.launchDoom()
+        } else if (root.currentGame === "doom" && doomLoader.item) {
+          if (doomLoader.item.handleKeyPress(event)) {
             event.accepted = true
             return
           }
@@ -152,13 +109,17 @@ Panel {
           if (dinoLoader.item.handleKeyRelease(event)) {
             event.accepted = true
           }
+        } else if (root.currentGame === "doom" && doomLoader.item) {
+          if (doomLoader.item.handleKeyRelease(event)) {
+            event.accepted = true
+          }
         }
       }
 
       // Edge-to-edge game canvas (zero extra text or headers)
       Rectangle {
         anchors.fill: parent
-        radius: Style.cornerRadius > 0 ? Style.cornerRadius : 6
+        radius: root.isFullscreen ? 0 : (Style.cornerRadius > 0 ? Style.cornerRadius : 6)
         color: root.currentGame === "dino" ? "#f7f7f7" : "#000000"
         clip: true
 
@@ -178,71 +139,12 @@ Panel {
           sourceComponent: DinoGame {}
         }
 
-        // DOOM Gateway Screen
-        Item {
-          id: doomView
+        Loader {
+          id: doomLoader
           anchors.fill: parent
-          visible: root.currentGame === "doom"
-
-          Rectangle {
-            anchors.fill: parent
-            color: "#0a0000"
-
-            Column {
-              anchors.centerIn: parent
-              spacing: 12
-
-              Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: "🔥 DOOM 🔥"
-                font.family: Style.font.family
-                font.pixelSize: 22
-                font.bold: true
-                color: "#ff3333"
-              }
-
-              Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: root.detectedWad.length > 0 ? "WAD: " + root.detectedWad.split("/").pop() : "Scanning for DOOM.WAD..."
-                font.family: Style.font.family
-                font.pixelSize: 11
-                color: "#ffaa44"
-              }
-
-              Rectangle {
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: 140
-                height: 32
-                radius: 6
-                color: "#aa0000"
-                border.color: "#ff4444"
-                border.width: 1.5
-
-                Text {
-                  anchors.centerIn: parent
-                  text: "RIP AND TEAR"
-                  font.family: Style.font.family
-                  font.pixelSize: 11
-                  font.bold: true
-                  color: "#ffffff"
-                }
-
-                MouseArea {
-                  anchors.fill: parent
-                  cursorShape: Qt.PointingHandCursor
-                  onClicked: root.launchDoom()
-                }
-              }
-
-              Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: "Press ENTER / SPACE to Launch"
-                font.family: Style.font.family
-                font.pixelSize: 10
-                color: "#888888"
-              }
-            }
-          }
+          active: root.currentGame === "doom"
+          visible: active
+          sourceComponent: DoomGame {}
         }
       }
     }
