@@ -203,68 +203,70 @@ Panel {
           sourceComponent: DinoGame {}
         }
 
-        // DOOM Engine Portal Screen (Deoxizn/omarchy-doom architecture)
+        // Custom DOOM Artwork Launch Portal
         Item {
           id: doomView
           anchors.fill: parent
           visible: root.currentGame === "doom"
 
+          Image {
+            anchors.fill: parent
+            source: Qt.resolvedUrl("Assets/Doom/doom1.jpg")
+            fillMode: Image.PreserveAspectCrop
+            asynchronous: true
+          }
+
+          // Atmospheric Dark Vignette Gradient
           Rectangle {
             anchors.fill: parent
-            color: "#0a0000"
+            gradient: Gradient {
+              GradientStop { position: 0.0; color: "#40000000" }
+              GradientStop { position: 0.55; color: "#66000000" }
+              GradientStop { position: 1.0; color: "#d9000000" }
+            }
+          }
 
-            Column {
-              anchors.centerIn: parent
-              spacing: 12
+          // Single Epic DOOM Launch Button
+          MouseArea {
+            id: btnMouse
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 24
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: 220
+            height: 48
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.launchDoom()
 
-              Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: root.isDoomRunning ? "🔥 DOOM RUNNING 🔥" : "💀 DOOM RETRO 💀"
-                font.family: Style.font.family
-                font.pixelSize: 20
-                font.bold: true
-                color: root.isDoomRunning ? "#ffaa00" : "#ff3333"
-              }
+            Rectangle {
+              id: doomBtn
+              anchors.fill: parent
+              radius: 8
+              color: root.isDoomRunning ? "#550000" : (btnMouse.containsMouse ? "#cc1111" : "#990000")
+              border.color: root.isDoomRunning ? "#ff5555" : (btnMouse.containsMouse ? "#ffcc00" : "#ff3333")
+              border.width: 2
 
-              Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: root.detectedWad.length > 0 ? "WAD: " + root.detectedWad.split("/").pop() : "WAD: Auto-detecting..."
-                font.family: Style.font.family
-                font.pixelSize: 11
-                color: "#ffaa44"
-              }
+              Behavior on color { ColorAnimation { duration: 120 } }
+              Behavior on border.color { ColorAnimation { duration: 120 } }
 
-              Rectangle {
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: 150
-                height: 34
-                radius: 6
-                color: root.isDoomRunning ? "#440000" : "#aa0000"
-                border.color: root.isDoomRunning ? "#ff6666" : "#ff4444"
-                border.width: 1.5
+              Row {
+                anchors.centerIn: parent
+                spacing: 8
 
                 Text {
-                  anchors.centerIn: parent
-                  text: root.isDoomRunning ? "KILL PROCESS" : "RIP AND TEAR"
+                  anchors.verticalCenter: parent.verticalCenter
+                  text: root.isDoomRunning ? "🔥" : "💀"
+                  font.pixelSize: 18
+                }
+
+                Text {
+                  anchors.verticalCenter: parent.verticalCenter
+                  text: root.isDoomRunning ? "KILL DOOM" : "RIP AND TEAR"
                   font.family: Style.font.family
-                  font.pixelSize: 11
+                  font.pixelSize: 15
                   font.bold: true
                   color: "#ffffff"
                 }
-
-                MouseArea {
-                  anchors.fill: parent
-                  cursorShape: Qt.PointingHandCursor
-                  onClicked: root.launchDoom()
-                }
-              }
-
-              Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: root.isDoomRunning ? "Click above to terminate DOOM" : "Press ENTER or click to launch"
-                font.family: Style.font.family
-                font.pixelSize: 10
-                color: "#888888"
               }
             }
           }
